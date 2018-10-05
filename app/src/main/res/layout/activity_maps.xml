@@ -16,15 +16,17 @@
 
 
     <EditText
-        android:id="@+id/searchView1"
+        android:id="@+id/search"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:padding="10dp"
+        android:inputType="number"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="18dp"
         android:layout_marginTop="14dp"
         android:hint="Search Number"
+        android:onClick="TapEvent"
         android:textColor="@android:color/black"
         android:background="@android:color/white" >
     </EditText>
@@ -34,8 +36,7 @@
         android:layout_marginRight="10dp"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_alignBaseline="@+id/searchView1"
-        android:layout_alignBottom="@+id/searchView1"
-        android:layout_alignRight="@+id/searchView1"
+        android:layout_toEndOf="@+id/search"
+        android:layout_marginTop="22dp"
         android:background="@drawable/search" />
 </RelativeLayout>
