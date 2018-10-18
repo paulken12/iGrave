@@ -6,15 +6,8 @@ import android.os.Parcelable;
 
 import com.secure.paulken.igrave.DBHelper.ItemsTable;
 
-public class DataItems implements Parcelable {
+public class OwnerItems implements Parcelable {
 
-    private int tomb_id;
-    private String tomb_block;
-    private int tomb_lot_no;
-    private double tomb_lat;
-    private double tomb_long;
-    private String tomb_stat;
-    private int tomb_owner;
     private int owner_id;
     private String owner_fname;
     private String owner_mname;
@@ -22,17 +15,26 @@ public class DataItems implements Parcelable {
     private String owner_bdate;
     private String owner_ddate;
     private String owner_con_per;
+    private String owner_status;
 
-    public DataItems(){}
+    public OwnerItems(){}
 
-    public DataItems(int tomb_id, String tomb_block, int tomb_lot_no, double tomb_lat, double tomb_long, String tomb_stat, int tomb_owner, int owner_id, String owner_fname, String owner_mname, String owner_lname, String owner_bdate, String owner_ddate, String owner_con_per, String owner_status) {
-        this.tomb_id = tomb_id;
-        this.tomb_block = tomb_block;
-        this.tomb_lot_no = tomb_lot_no;
-        this.tomb_lat = tomb_lat;
-        this.tomb_long = tomb_long;
-        this.tomb_stat = tomb_stat;
-        this.tomb_owner = tomb_owner;
+
+
+    public ContentValues ownerValues()
+    {
+        ContentValues values = new ContentValues(7);
+        values.put(ItemsTable.COL_OWNER_FNAME,owner_fname);
+        values.put(ItemsTable.COL_OWNER_MNAME,owner_mname);
+        values.put(ItemsTable.COL_OWNER_LNAME,owner_lname);
+        values.put(ItemsTable.COL_OWNER_BDATE,owner_bdate);
+        values.put(ItemsTable.COL_OWNER_DDATE,owner_ddate);
+        values.put(ItemsTable.COL_OWNER_CON_PER,owner_con_per);
+        values.put(ItemsTable.COL_OWNER_STATUS,owner_status);
+        return values;
+    }
+
+    public OwnerItems(int owner_id, String owner_fname, String owner_mname, String owner_lname, String owner_bdate, String owner_ddate, String owner_con_per, String owner_status) {
         this.owner_id = owner_id;
         this.owner_fname = owner_fname;
         this.owner_mname = owner_mname;
@@ -43,60 +45,14 @@ public class DataItems implements Parcelable {
         this.owner_status = owner_status;
     }
 
-    public int getTomb_id() {
-        return tomb_id;
-    }
-
-    public void setTomb_id(int tomb_id) {
-        this.tomb_id = tomb_id;
-    }
-
-    public String getTomb_block() {
-        return tomb_block;
-    }
-
-    public void setTomb_block(String tomb_block) {
-        this.tomb_block = tomb_block;
-    }
-
-    public int getTomb_lot_no() {
-        return tomb_lot_no;
-    }
-
-    public void setTomb_lot_no(int tomb_lot_no) {
-        this.tomb_lot_no = tomb_lot_no;
-    }
-
-    public double getTomb_lat() {
-        return tomb_lat;
-    }
-
-    public void setTomb_lat(double tomb_lat) {
-        this.tomb_lat = tomb_lat;
-    }
-
-    public double getTomb_long() {
-        return tomb_long;
-    }
-
-    public void setTomb_long(double tomb_long) {
-        this.tomb_long = tomb_long;
-    }
-
-    public String getTomb_stat() {
-        return tomb_stat;
-    }
-
-    public void setTomb_stat(String tomb_stat) {
-        this.tomb_stat = tomb_stat;
-    }
-
-    public int getTomb_owner() {
-        return tomb_owner;
-    }
-
-    public void setTomb_owner(int tomb_owner) {
-        this.tomb_owner = tomb_owner;
+    public OwnerItems(String owner_fname, String owner_mname, String owner_lname, String owner_bdate, String owner_ddate, String owner_con_per, String owner_status) {
+        this.owner_fname = owner_fname;
+        this.owner_mname = owner_mname;
+        this.owner_lname = owner_lname;
+        this.owner_bdate = owner_bdate;
+        this.owner_ddate = owner_ddate;
+        this.owner_con_per = owner_con_per;
+        this.owner_status = owner_status;
     }
 
     public int getOwner_id() {
@@ -163,17 +119,7 @@ public class DataItems implements Parcelable {
         this.owner_status = owner_status;
     }
 
-    private String owner_status;
-
-
-    protected DataItems(Parcel in) {
-        tomb_id = in.readInt();
-        tomb_block = in.readString();
-        tomb_lot_no = in.readInt();
-        tomb_lat = in.readDouble();
-        tomb_long = in.readDouble();
-        tomb_stat = in.readString();
-        tomb_owner = in.readInt();
+    protected OwnerItems(Parcel in) {
         owner_id = in.readInt();
         owner_fname = in.readString();
         owner_mname = in.readString();
@@ -186,13 +132,6 @@ public class DataItems implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(tomb_id);
-        dest.writeString(tomb_block);
-        dest.writeInt(tomb_lot_no);
-        dest.writeDouble(tomb_lat);
-        dest.writeDouble(tomb_long);
-        dest.writeString(tomb_stat);
-        dest.writeInt(tomb_owner);
         dest.writeInt(owner_id);
         dest.writeString(owner_fname);
         dest.writeString(owner_mname);
@@ -208,15 +147,15 @@ public class DataItems implements Parcelable {
         return 0;
     }
 
-    public static final Creator<DataItems> CREATOR = new Creator<DataItems>() {
+    public static final Creator<OwnerItems> CREATOR = new Creator<OwnerItems>() {
         @Override
-        public DataItems createFromParcel(Parcel in) {
-            return new DataItems(in);
+        public OwnerItems createFromParcel(Parcel in) {
+            return new OwnerItems(in);
         }
 
         @Override
-        public DataItems[] newArray(int size) {
-            return new DataItems[size];
+        public OwnerItems[] newArray(int size) {
+            return new OwnerItems[size];
         }
     };
 }
