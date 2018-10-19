@@ -304,6 +304,10 @@ public class MapsActivity extends FragmentActivity implements
                                     .pattern(PATTERN_POLYLINE_DOTTED)
                                     .color(Color.RED));
 
+        TextView dist = findViewById(R.id.distance);
+
+        dist.setText(CalculationByDistance(one,two));
+
         List<DataItems> items = mDataSource.getAll();
 
 
@@ -840,11 +844,17 @@ public class MapsActivity extends FragmentActivity implements
         double km = valueResult / 1;
         DecimalFormat newFormat = new DecimalFormat("####");
         int kmInDec = Integer.valueOf(newFormat.format(km));
+
+
         double meter = valueResult % 1000;
         int meterInDec = Integer.valueOf(newFormat.format(meter));
+
+        DecimalFormat format = new DecimalFormat("#.###");
+        String formatted = format.format(valueResult);
+
         Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
                 + " Meter   " + meterInDec);
 
-        return valueResult + "km";
+        return formatted + "m";
     }
 }

@@ -1,0 +1,52 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:layout_centerInParent="true">
+
+
+    <EditText
+        android:id="@+id/block_num"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Block No."
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/lot_num"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Lot No."
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/lat_num"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Latitude"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/long_num"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Longitude"
+        android:inputType="numberDecimal" />
+
+
+    <Button
+        android:id="@+id/lot_submit"
+        android:layout_width="344dp"
+        android:layout_height="wrap_content"
+        android:onClick="submit"
+        android:text="Submit" />
+
+
+</LinearLayout>

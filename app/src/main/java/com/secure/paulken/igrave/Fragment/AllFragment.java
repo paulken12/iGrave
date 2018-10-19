@@ -71,6 +71,7 @@ public class AllFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(getActivity(),SettingActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra(UPDATE_KEY ,items);
                         startActivity(intent);
                     }

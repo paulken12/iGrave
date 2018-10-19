@@ -272,4 +272,16 @@ public class SettingActivity extends AppCompatActivity {
         final AlertDialog alert = dialog.create();
         alert.show();
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        this.setIntent(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Toast.makeText(SettingActivity.this,"Setting Backpressed", Toast.LENGTH_LONG).show();
+    }
 }

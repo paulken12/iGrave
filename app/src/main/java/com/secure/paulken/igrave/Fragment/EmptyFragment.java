@@ -11,11 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.secure.paulken.igrave.Adapter.ListAdapter;
 import com.secure.paulken.igrave.DBHelper.DataSource;
 import com.secure.paulken.igrave.ListActivity;
+import com.secure.paulken.igrave.LotActivity;
 import com.secure.paulken.igrave.Model.DataItems;
 import com.secure.paulken.igrave.Model.TombItems;
 import com.secure.paulken.igrave.R;
@@ -33,6 +35,7 @@ public class EmptyFragment extends Fragment {
     DataSource dataSource;
     private List<DataItems> dataItems;
     public static final String ADD_KEY = "ADD_KEY";
+    Button add_lot;
 
     public EmptyFragment() {
         // Required empty public constructor
@@ -42,6 +45,8 @@ public class EmptyFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataSource = new DataSource(getContext());
+
+
     }
 
     @Override
@@ -67,6 +72,7 @@ public class EmptyFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(getActivity(),SettingActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra(ADD_KEY ,items);
                         startActivity(intent);
                     }
@@ -81,6 +87,16 @@ public class EmptyFragment extends Fragment {
                 final AlertDialog alert = dialog.create();
                 alert.show();
                 return false;
+            }
+        });
+
+        add_lot = mView.findViewById(R.id.add_lot);
+
+        add_lot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), LotActivity.class);
+                startActivity(intent);
             }
         });
 
