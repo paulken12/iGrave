@@ -45,6 +45,7 @@ import com.secure.paulken.igrave.Model.DataItems;
 import com.secure.paulken.igrave.Model.DeceaseItems;
 import com.secure.paulken.igrave.Model.OwnerItems;
 import com.secure.paulken.igrave.Model.TombItems;
+import com.secure.paulken.igrave.WindowTitle.InfoWindowCustom;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -118,6 +119,8 @@ public class MapsActivity extends FragmentActivity implements
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+
         mDataSource = new DataSource(this);
         mDataSource.open();
 
@@ -171,6 +174,7 @@ public class MapsActivity extends FragmentActivity implements
 //        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.setMinZoomPreference(19);
 
+        mMap.setInfoWindowAdapter(new InfoWindowCustom(this));
 
         try {
             // Customise the styling of the base map using a JSON object defined
@@ -325,7 +329,9 @@ public class MapsActivity extends FragmentActivity implements
         List<DataItems> items = mDataSource.getAll();
 
         for(DataItems dataItems: items){
-            markers = mMap.addMarker(marker(String.valueOf(dataItems.getTomb_lot_no()), dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
+            markers = mMap.addMarker(marker(String.valueOf(dataItems.getDecease_fname())+" "+String.valueOf(dataItems.getDecease_lname())
+                    ,dataItems.getDecease_bdate()+"-"+dataItems.getDecease_ddate()
+                    , dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
         }
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -374,8 +380,9 @@ public class MapsActivity extends FragmentActivity implements
                                     .build();
                             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                            markers = mMap.addMarker(marker(String.valueOf(dataItems.getTomb_lot_no()), dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
-
+                            markers = mMap.addMarker(marker(String.valueOf(dataItems.getDecease_fname())+" "+String.valueOf(dataItems.getDecease_lname())
+                                    ,dataItems.getDecease_bdate()+" to "+dataItems.getDecease_ddate()
+                                    , dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
                             MarkerOptions a = new MarkerOptions()
                                     .title("Pathway")
                                     .position(new LatLng(16.376665, 120.608495))
@@ -469,11 +476,12 @@ public class MapsActivity extends FragmentActivity implements
                                     .build();
                             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                            markers = mMap.addMarker(marker(String.valueOf(dataItems.getTomb_lot_no()), dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
-
+                            markers = mMap.addMarker(marker(String.valueOf(dataItems.getDecease_fname())+" "+String.valueOf(dataItems.getDecease_lname())
+                                    ,dataItems.getDecease_bdate()+" to "+dataItems.getDecease_ddate()
+                                    , dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
                             MarkerOptions a = new MarkerOptions()
                                     .title("Pathway")
-                                    .position(new LatLng(16.376665, 120.608495))
+                                    .position(four)
                                     .icon(BitmapDescriptorFactory.defaultMarker());
                             markers = mMap.addMarker(a);
 
@@ -481,7 +489,6 @@ public class MapsActivity extends FragmentActivity implements
 
 
                                 MarkerOptions mark = new MarkerOptions()
-//                                    .title(n.getFirst_name()+" "+n.getLast_name()+" Birthday:" + n.getBirth_date())
                                         .title(dataItems.getOwner_fname()+","+dataItems.getOwner_fname())
                                         .position(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()))
                                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
@@ -558,7 +565,7 @@ public class MapsActivity extends FragmentActivity implements
         stylePolygon(block_9);
     }
 
-    public MarkerOptions marker(String title, double lat, double lon, String stat) {
+    public MarkerOptions marker(String title,String snippet, double lat, double lon, String stat) {
 
         if(stat.equalsIgnoreCase("occupied")){
             mark = R.drawable.m1;
@@ -571,6 +578,7 @@ public class MapsActivity extends FragmentActivity implements
         }
         MarkerOptions a = new MarkerOptions()
                 .title(title)
+                .snippet(snippet)
                 .position(new LatLng(lat, lon))
                 .icon(BitmapDescriptorFactory.fromResource(mark));
 
