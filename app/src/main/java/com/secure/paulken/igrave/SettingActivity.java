@@ -2,24 +2,29 @@ package com.secure.paulken.igrave;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.secure.paulken.igrave.DBHelper.DataSource;
 import com.secure.paulken.igrave.Fragment.AllFragment;
 import com.secure.paulken.igrave.Fragment.EmptyFragment;
 import com.secure.paulken.igrave.Model.DataItems;
+import com.secure.paulken.igrave.Model.DeceaseItems;
 import com.secure.paulken.igrave.Model.OwnerItems;
 import com.secure.paulken.igrave.Model.TombItems;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,17 +32,12 @@ public class SettingActivity extends AppCompatActivity {
 
     DataSource mDataSource;
 
-    EditText block ;
-    EditText first ;
-    EditText mid;
-    EditText last;
-    EditText bday ;
-    EditText dday ;
-    EditText con;
-    EditText lotLat;
-    EditText lotLong ;
-    RadioButton decease,reservee;
+    EditText block,lot_number , dec_first, dec_mid, dec_last,own_first, own_mid, own_last, dec_bdate, dec_ddate, dec_owner,own_add,own_con,lotLat,lotLong ;
     String mFirst,mMiddle,mLast,mBDay,mDDay,mCon;
+    String oFirst,oMiddle,oLast,oAdd,oCon;
+    String block_spin;
+    Spinner block_spinner;
+    TextView tv_block_num,tv_lot_num;
 
 
     Button submit;
@@ -47,7 +47,7 @@ public class SettingActivity extends AppCompatActivity {
 
     String status = "decease";
     String tomb_status = "occupied";
-    int owner_id;
+    int owner_id, decease_id;
 
 
 
@@ -56,37 +56,58 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-        first  = findViewById(R.id.add_first);
-        mid = findViewById(R.id.add_middle);
-        last = findViewById(R.id.add_last);
-        bday  = findViewById(R.id.add_bday);
-        dday  = findViewById(R.id.add_dday);
-        con = findViewById(R.id.add_con);
+        dec_first = findViewById(R.id.add_first);
+        dec_mid = findViewById(R.id.add_middle);
+        dec_last = findViewById(R.id.add_last);
+        dec_bdate = findViewById(R.id.add_bday);
+        dec_ddate = findViewById(R.id.add_dday);
+
+        own_first = findViewById(R.id.owner_first);
+        own_mid = findViewById(R.id.owner_middle);
+        own_last = findViewById(R.id.owner_last);
+        own_add = findViewById(R.id.owner_address);
+        own_con = findViewById(R.id.owner_con);
+
+        tv_block_num = findViewById(R.id.block_text);
+        tv_lot_num = findViewById(R.id.tomb_lot_num);
+
+        block_spinner = findViewById(R.id.block_spinner);
+
+
         submit = findViewById(R.id.add_submit);
-        decease = findViewById(R.id.radio_decease);
-        reservee = findViewById(R.id.radio_reserved);
 
         mDataSource = new DataSource(this);
         mDataSource.open();
 
+
+
+        //Add spinner from db
+
+//        List<String> items = mDataSource.block();
+//
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        block_spinner.setAdapter(adapter);
+
+
+
         dataItems = Objects.requireNonNull(getIntent().getExtras()).getParcelable(AllFragment.UPDATE_KEY);
         if (dataItems != null) {
-            toast("received from all/reserved");
-            first.setText(dataItems.getOwner_fname());
-            mid.setText(dataItems.getOwner_mname());
-            last.setText(dataItems.getOwner_lname());
-            bday.setText(dataItems.getOwner_bdate());
-            dday.setText(dataItems.getOwner_ddate());
-            con.setText(dataItems.getOwner_con_per());
 
-            if(dataItems.getOwner_status().equalsIgnoreCase("decease"))
-            {
-                decease.toggle();
-                reservee.setClickable(false);
-            }
-            else{
-                reservee.toggle();
-            }
+            dec_first.setText(dataItems.getDecease_fname());
+            dec_mid.setText(dataItems.getDecease_mname());
+            dec_last.setText(dataItems.getDecease_lname());
+            dec_bdate.setText(dataItems.getDecease_bdate());
+            dec_ddate.setText(dataItems.getDecease_ddate());
+
+            own_first.setText(dataItems.getOwner_fname());
+            own_mid.setText(dataItems.getOwner_mname());
+            own_last.setText(dataItems.getOwner_lname());
+            own_add.setText(dataItems.getOwner_address());
+            own_con.setText(dataItems.getOwner_con_per());
+
+            tv_block_num.setText(" : "+dataItems.getTomb_block());
+            tv_lot_num.setText("Lot : "+dataItems.getTomb_lot_no());
 
             submit.setText("Update");
         }
@@ -94,20 +115,38 @@ public class SettingActivity extends AppCompatActivity {
         addItems = Objects.requireNonNull(getIntent().getExtras()).getParcelable(EmptyFragment.ADD_KEY);
         if (addItems != null) {
             toast("received from empty");
+            tv_block_num.setText(": "+addItems.getTomb_block());
+            tv_lot_num.setText("Lot: "+addItems.getTomb_lot_no());
             submit.setText("Add");
         }
+
+//        block_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                block_spin = adapterView.getItemAtPosition(i).toString();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
     }
 
     public void submit(View view) {
 
 
-        mFirst = first.getText().toString();
-        mMiddle = mid.getText().toString();
-        mLast = last.getText().toString();
-        mBDay = bday.getText().toString();
-        mDDay = dday.getText().toString();
-        mCon = con.getText().toString();
+        mFirst = dec_first.getText().toString();
+        mMiddle = dec_mid.getText().toString();
+        mLast = dec_last.getText().toString();
+        mBDay = dec_bdate.getText().toString();
+        mDDay = dec_ddate.getText().toString();
 
+        oFirst = own_first.getText().toString();
+        oMiddle = own_mid.getText().toString();
+        oLast = own_last.getText().toString();
+        oAdd = own_add.getText().toString();
+        oCon = own_con.getText().toString();
 
         if(dataItems != null){
             update();
@@ -122,26 +161,19 @@ public class SettingActivity extends AppCompatActivity {
     public void update() {
 
         owner_id = dataItems.getOwner_id();
+        decease_id = dataItems.getDecease_id();
 
-        OwnerItems info =  new OwnerItems(owner_id,mFirst,mMiddle,mLast,mBDay,mDDay,mCon,status);
+        Log.e("test", ""+owner_id+": owner "+decease_id+":deceased");
 
-        if(dataItems.getTomb_stat().equalsIgnoreCase("reserved")){
+        DeceaseItems deceaseItems = new DeceaseItems(decease_id,mFirst,mMiddle,mLast,mBDay,mDDay,owner_id);
 
-            TombItems tomb = new TombItems(dataItems.getTomb_id(),dataItems.getTomb_block()
-                    ,dataItems.getTomb_lot_no()
-                    ,dataItems.getTomb_lat()
-                    ,dataItems.getTomb_long()
-                    ,"occupied"
-                    ,info.getOwner_id());
+        Log.e("test", "fname:"+deceaseItems.getDecease_fname()+" mname"+dataItems.getDecease_lname()+":deceased");
 
-            mDataSource.updateOwner(info);
-            mDataSource.updateTomb(tomb);
-            clear();
-        }else{
+        OwnerItems info =  new OwnerItems(owner_id,oFirst,oMiddle,oLast,oAdd,oCon);
 
-            mDataSource.updateOwner(info);
-            clear();
-        }
+        mDataSource.updateDecease(deceaseItems);
+        mDataSource.updateOwner(info);
+        clear();
 
         toast("Successfully updated");
 
@@ -149,18 +181,6 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     public void add(){
-
-        OwnerItems info =  new OwnerItems(mFirst,mMiddle,mLast,mBDay,mDDay,mCon,status);
-        mDataSource.insertOwner(info);
-        int lastId = mDataSource.lastId();
-        Log.d("hehe",""+lastId
-                +" "+info.getOwner_fname()
-                +" "+info.getOwner_mname()
-                +" "+info.getOwner_lname()
-                +" "+info.getOwner_bdate()
-                +" "+info.getOwner_ddate()
-                +" "+info.getOwner_con_per()
-                +" "+info.getOwner_status());
 
         if(mFirst.isEmpty()){
             toast("First name cannot be empty!");
@@ -182,28 +202,24 @@ public class SettingActivity extends AppCompatActivity {
             toast("Death date cannot be empty!");
             return;
         }
-        if(mCon.isEmpty()){
-            toast("Contact person cannot be empty!");
-            return;
-        }
-        if(!checked){
-            alert("Decease or Reservation");
-            return;
-        }
 
         else
         {
-            if(status.equalsIgnoreCase("reserved")) {
-                tomb_status = "reserved";
-            }
+            OwnerItems info =  new OwnerItems(oFirst,oMiddle,oLast,oAdd,oCon);
+            mDataSource.insertOwner(info);
+            int lastOwnerId = mDataSource.lastIdOwner();
+
+            DeceaseItems deceaseItems = new DeceaseItems(mFirst,mMiddle,mLast,mBDay,mDDay,lastOwnerId);
+            mDataSource.insertDecease(deceaseItems);
+            int lastDeceaseId = mDataSource.lastIdDecease();
+
 
             TombItems tomb = new TombItems(addItems.getTomb_id(),addItems.getTomb_block()
                 ,addItems.getTomb_lot_no()
                 ,addItems.getTomb_lat()
                 ,addItems.getTomb_long()
                 ,tomb_status
-                ,lastId);
-
+                ,lastDeceaseId);
 
                 mDataSource.updateTomb(tomb);
 
@@ -214,22 +230,22 @@ public class SettingActivity extends AppCompatActivity {
         goBack();
     }
 
-    public void onRadioButtonClicked(View view) {
-        checked = ((RadioButton) view).isChecked();
-
-        switch(view.getId()) {
-            case R.id.radio_decease:
-                if (checked)
-                    status = "decease";
-                toast(status);
-                    break;
-            case R.id.radio_reserved:
-                if (checked)
-                    status = "reserved";
-                toast(status);
-                    break;
-        }
-    }
+//    public void onRadioButtonClicked(View view) {
+//        checked = ((RadioButton) view).isChecked();
+//
+//        switch(view.getId()) {
+//            case R.id.radio_decease:
+//                if (checked)
+//                    status = "decease";
+//                toast(status);
+//                    break;
+//            case R.id.radio_reserved:
+//                if (checked)
+//                    status = "reserved";
+//                toast(status);
+//                    break;
+//        }
+//    }
 
     public void goBack(){
         Intent list = new Intent(SettingActivity.this,MainActivity.class);
@@ -242,13 +258,17 @@ public class SettingActivity extends AppCompatActivity {
 
     public void clear(){
         owner_id = 0;
-        first.setText("");
-        mid.setText("");
-        last.setText("");
-        bday.setText("");
-        dday.setText("");
-        con.setText("");
+        dec_first.setText("");
+        dec_mid.setText("");
+        dec_last.setText("");
+        dec_bdate.setText("");
+        dec_ddate.setText("");
 
+        own_first.setText("");
+        own_mid.setText("");
+        own_last.setText("");
+        own_add.setText("");
+        own_con.setText("");
     }
 
     public void alert(String message){

@@ -21,6 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(ItemsTable.CREATE_TOMB);
         sqLiteDatabase.execSQL(ItemsTable.CREATE_OWNER);
+        sqLiteDatabase.execSQL(ItemsTable.CREATE_DECEASE);
     }
 
     @Override

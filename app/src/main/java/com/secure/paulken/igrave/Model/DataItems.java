@@ -15,17 +15,29 @@ public class DataItems implements Parcelable {
     private double tomb_long;
     private String tomb_stat;
     private int tomb_owner;
+
     private int owner_id;
     private String owner_fname;
     private String owner_mname;
     private String owner_lname;
-    private String owner_bdate;
-    private String owner_ddate;
+    private String owner_address;
     private String owner_con_per;
+
+    private int    decease_id;
+    private String decease_fname;
+    private String decease_mname;
+    private String decease_lname;
+    private String decease_bdate;
+    private String decease_ddate;
+    private int decease_owner;
 
     public DataItems(){}
 
-    public DataItems(int tomb_id, String tomb_block, int tomb_lot_no, double tomb_lat, double tomb_long, String tomb_stat, int tomb_owner, int owner_id, String owner_fname, String owner_mname, String owner_lname, String owner_bdate, String owner_ddate, String owner_con_per, String owner_status) {
+    public DataItems(String tomb_block){
+        this.tomb_block = tomb_block;
+    }
+
+    public DataItems(int tomb_id, String tomb_block, int tomb_lot_no, double tomb_lat, double tomb_long, String tomb_stat, int tomb_owner, int owner_id, String owner_fname, String owner_mname, String owner_lname, String owner_address, String owner_con_per, int decease_id, String decease_fname, String decease_mname, String decease_lname, String decease_bdate, String decease_ddate, int decease_owner) {
         this.tomb_id = tomb_id;
         this.tomb_block = tomb_block;
         this.tomb_lot_no = tomb_lot_no;
@@ -37,10 +49,15 @@ public class DataItems implements Parcelable {
         this.owner_fname = owner_fname;
         this.owner_mname = owner_mname;
         this.owner_lname = owner_lname;
-        this.owner_bdate = owner_bdate;
-        this.owner_ddate = owner_ddate;
+        this.owner_address = owner_address;
         this.owner_con_per = owner_con_per;
-        this.owner_status = owner_status;
+        this.decease_id = decease_id;
+        this.decease_fname = decease_fname;
+        this.decease_mname = decease_mname;
+        this.decease_lname = decease_lname;
+        this.decease_bdate = decease_bdate;
+        this.decease_ddate = decease_ddate;
+        this.decease_owner = decease_owner;
     }
 
     public int getTomb_id() {
@@ -131,20 +148,12 @@ public class DataItems implements Parcelable {
         this.owner_lname = owner_lname;
     }
 
-    public String getOwner_bdate() {
-        return owner_bdate;
+    public String getOwner_address() {
+        return owner_address;
     }
 
-    public void setOwner_bdate(String owner_bdate) {
-        this.owner_bdate = owner_bdate;
-    }
-
-    public String getOwner_ddate() {
-        return owner_ddate;
-    }
-
-    public void setOwner_ddate(String owner_ddate) {
-        this.owner_ddate = owner_ddate;
+    public void setOwner_address(String owner_address) {
+        this.owner_address = owner_address;
     }
 
     public String getOwner_con_per() {
@@ -155,16 +164,61 @@ public class DataItems implements Parcelable {
         this.owner_con_per = owner_con_per;
     }
 
-    public String getOwner_status() {
-        return owner_status;
+    public int getDecease_id() {
+        return decease_id;
     }
 
-    public void setOwner_status(String owner_status) {
-        this.owner_status = owner_status;
+    public void setDecease_id(int decease_id) {
+        this.decease_id = decease_id;
     }
 
-    private String owner_status;
+    public String getDecease_fname() {
+        return decease_fname;
+    }
 
+    public void setDecease_fname(String decease_fname) {
+        this.decease_fname = decease_fname;
+    }
+
+    public String getDecease_mname() {
+        return decease_mname;
+    }
+
+    public void setDecease_mname(String decease_mname) {
+        this.decease_mname = decease_mname;
+    }
+
+    public String getDecease_lname() {
+        return decease_lname;
+    }
+
+    public void setDecease_lname(String decease_lname) {
+        this.decease_lname = decease_lname;
+    }
+
+    public String getDecease_bdate() {
+        return decease_bdate;
+    }
+
+    public void setDecease_bdate(String decease_bdate) {
+        this.decease_bdate = decease_bdate;
+    }
+
+    public String getDecease_ddate() {
+        return decease_ddate;
+    }
+
+    public void setDecease_ddate(String decease_ddate) {
+        this.decease_ddate = decease_ddate;
+    }
+
+    public int getDecease_owner() {
+        return decease_owner;
+    }
+
+    public void setDecease_owner(int decease_owner) {
+        this.decease_owner = decease_owner;
+    }
 
     protected DataItems(Parcel in) {
         tomb_id = in.readInt();
@@ -178,10 +232,15 @@ public class DataItems implements Parcelable {
         owner_fname = in.readString();
         owner_mname = in.readString();
         owner_lname = in.readString();
-        owner_bdate = in.readString();
-        owner_ddate = in.readString();
+        owner_address = in.readString();
         owner_con_per = in.readString();
-        owner_status = in.readString();
+        decease_id = in.readInt();
+        decease_fname = in.readString();
+        decease_mname = in.readString();
+        decease_lname = in.readString();
+        decease_bdate = in.readString();
+        decease_ddate = in.readString();
+        decease_owner = in.readInt();
     }
 
     @Override
@@ -197,10 +256,15 @@ public class DataItems implements Parcelable {
         dest.writeString(owner_fname);
         dest.writeString(owner_mname);
         dest.writeString(owner_lname);
-        dest.writeString(owner_bdate);
-        dest.writeString(owner_ddate);
+        dest.writeString(owner_address);
         dest.writeString(owner_con_per);
-        dest.writeString(owner_status);
+        dest.writeInt(decease_id);
+        dest.writeString(decease_fname);
+        dest.writeString(decease_mname);
+        dest.writeString(decease_lname);
+        dest.writeString(decease_bdate);
+        dest.writeString(decease_ddate);
+        dest.writeInt(decease_owner);
     }
 
     @Override

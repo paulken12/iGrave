@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
 import com.secure.paulken.igrave.Model.DataItems;
+import com.secure.paulken.igrave.Model.DeceaseItems;
 import com.secure.paulken.igrave.Model.OwnerItems;
 import com.secure.paulken.igrave.Model.TombItems;
 
@@ -49,11 +50,25 @@ public class DataSource {
         return ownerItems;
     }
 
+    public DeceaseItems insertDecease(DeceaseItems deceaseItems) {
+        ContentValues contentValues = deceaseItems.deceaseValues();
+        mDatabase.insert(ItemsTable.TABLE_DECEASE, null, contentValues);
+        return deceaseItems;
+    }
+
+
     public OwnerItems updateOwner(OwnerItems ownerItems) {
         ContentValues contentValues = ownerItems.ownerValues();
         mDatabase.update(ItemsTable.TABLE_OWNER, contentValues, ItemsTable.COL_OWNER_ID + " = ?"
                 , new String[]{String.valueOf(ownerItems.getOwner_id())});
         return ownerItems;
+    }
+
+    public DeceaseItems updateDecease(DeceaseItems deceaseItems) {
+        ContentValues contentValues = deceaseItems.deceaseValues();
+        mDatabase.update(ItemsTable.TABLE_DECEASE, contentValues, ItemsTable.COL_DECEASE_ID + " = ?"
+                , new String[]{String.valueOf(deceaseItems.getDecease_id())});
+        return deceaseItems;
     }
 
     public TombItems updateTomb(TombItems tombItems) {
@@ -63,7 +78,7 @@ public class DataSource {
         return tombItems;
     }
 
-    public int lastId() {
+    public int lastIdDecease() {
         int id = 0;
         Cursor cursor = mDatabase.rawQuery("select owner_id from table_owner order by owner_id desc limit 1",null);
         if(cursor.moveToLast()){
@@ -73,6 +88,63 @@ public class DataSource {
         return id;
     }
 
+    public int lastIdOwner() {
+        int id = 0;
+        Cursor cursor = mDatabase.rawQuery("select decease_id from table_decease order by decease_id desc limit 1",null);
+        if(cursor.moveToLast()){
+            id = cursor.getInt(0);
+        }
+
+        return id;
+    }
+
+    public int occupied() {
+        int occupied = 0;
+        Cursor cursor = mDatabase.rawQuery("select count(tomb_id) from table_tomb where tomb_stat = 'occupied' limit 1",null);
+        if(cursor.moveToLast()){
+            occupied = cursor.getInt(0);
+        }
+
+        return occupied;
+    }
+
+    public int empty() {
+        int occupied = 0;
+        Cursor cursor = mDatabase.rawQuery("select count(tomb_id) from table_tomb where tomb_stat = 'empty' limit 1",null);
+        if(cursor.moveToLast()){
+            occupied = cursor.getInt(0);
+        }
+
+        return occupied;
+    }
+
+    public List<String> block() {
+        List<String> block = new ArrayList<>();
+
+        Cursor cursor = mDatabase.rawQuery("select distinct tomb_block from table_tomb order by tomb_block desc",null);
+        if(cursor.moveToFirst()){
+            do{
+                block.add(cursor.getString(0));
+            }while (cursor.moveToNext());
+        }
+
+        return block;
+    }
+
+
+    public List<DataItems> getBlock() {
+        List<DataItems> dataItems = new ArrayList<>();
+        Cursor cursor = mDatabase.rawQuery("select distinct tomb_id,tomb_block from table_tomb ", null);
+        while (cursor.moveToNext()) {
+            DataItems items = new DataItems();
+
+            items.setTomb_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_ID)));
+            items.setTomb_block(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_BLOCK)));
+            dataItems.add(items);
+        }
+        cursor.close();
+        return dataItems;
+    }
 
     public boolean ifItemExist(String code) {
         return DatabaseUtils.longForQuery(mDatabase, "SELECT first_name FROM table_location WHERE first_name = ? LIMIT 1", new String[]{code}) > 0;
@@ -105,8 +177,8 @@ public class DataSource {
 
     public List<DataItems> getAllItems() {
         List<DataItems> dataItems = new ArrayList<>();
-        Cursor cursor = mDatabase.rawQuery("select * from table_tomb inner join table_owner " +
-                "on table_tomb.tomb_id = table_owner.owner_id " +
+        Cursor cursor = mDatabase.rawQuery("select * from table_tomb " +
+                "join table_decease on table_tomb.tomb_id = table_decease.decease_id " +
                 "where table_tomb.tomb_stat = 'occupied'", null);
         while (cursor.moveToNext()) {
             DataItems items = new DataItems();
@@ -122,45 +194,49 @@ public class DataSource {
             items.setOwner_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_FNAME)));
             items.setOwner_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_MNAME)));
             items.setOwner_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_LNAME)));
-            items.setOwner_bdate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_BDATE)));
-            items.setOwner_ddate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_DDATE)));
+            items.setOwner_address(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_ADDRESS)));
             items.setOwner_con_per(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_CON_PER)));
-            items.setOwner_status(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_STATUS)));
+            items.setDecease_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_DECEASE_ID)));
+            items.setDecease_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_FNAME)));
+            items.setDecease_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_MNAME)));
+            items.setDecease_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_LNAME)));
+            items.setDecease_ddate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_DDATE)));
+            items.setDecease_bdate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_DDATE)));
+            items.setDecease_owner(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_DECEASE_OWNER)));
             dataItems.add(items);
         }
         cursor.close();
         return dataItems;
     }
 
-    public List<DataItems> getReserved() {
-        List<DataItems> dataItems = new ArrayList<>();
-        Cursor cursor = mDatabase.rawQuery("select * from table_tomb " +
-                "inner join table_owner " +
-                "on table_tomb.tomb_id = table_owner.owner_id " +
-                "where table_tomb.tomb_stat = 'reserved'", null);
-        while (cursor.moveToNext()) {
-            DataItems items = new DataItems();
-
-            items.setTomb_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_ID)));
-            items.setTomb_block(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_BLOCK)));
-            items.setTomb_lot_no(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_LOT_NO)));
-            items.setTomb_lat(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LAT)));
-            items.setTomb_long(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LONG)));
-            items.setTomb_stat(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_STAT)));
-            items.setTomb_owner(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_OWNER)));
-            items.setOwner_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_OWNER_ID)));
-            items.setOwner_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_FNAME)));
-            items.setOwner_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_MNAME)));
-            items.setOwner_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_LNAME)));
-            items.setOwner_bdate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_BDATE)));
-            items.setOwner_ddate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_DDATE)));
-            items.setOwner_con_per(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_CON_PER)));
-            items.setOwner_status(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_STATUS)));
-            dataItems.add(items);
-        }
-        cursor.close();
-        return dataItems;
-    }
+//    public List<DataItems> getReserved() {
+//        List<DataItems> dataItems = new ArrayList<>();
+//        Cursor cursor = mDatabase.rawQuery("select * from table_tomb " +
+//                "inner join table_owner " +
+//                "on table_tomb.tomb_id = table_owner.owner_id " +
+//                "where table_tomb.tomb_stat = 'reserved'", null);
+//        while (cursor.moveToNext()) {
+//            DataItems items = new DataItems();
+//
+//            items.setTomb_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_ID)));
+//            items.setTomb_block(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_BLOCK)));
+//            items.setTomb_lot_no(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_LOT_NO)));
+//            items.setTomb_lat(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LAT)));
+//            items.setTomb_long(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LONG)));
+//            items.setTomb_stat(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_STAT)));
+//            items.setTomb_owner(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_OWNER)));
+//            items.setOwner_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_OWNER_ID)));
+//            items.setOwner_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_FNAME)));
+//            items.setOwner_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_MNAME)));
+//            items.setOwner_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_LNAME)));
+//            items.setOwner_bdate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_BDATE)));
+//            items.setOwner_ddate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_DDATE)));
+//            items.setOwner_con_per(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_CON_PER)));
+//            dataItems.add(items);
+//        }
+//        cursor.close();
+//        return dataItems;
+//    }
 
     public List<DataItems> getEmpty() {
         List<DataItems> dataItems = new ArrayList<>();
@@ -183,8 +259,13 @@ public class DataSource {
 
     public List<DataItems> getAll() {
         List<DataItems> dataItems = new ArrayList<>();
-        Cursor cursor = mDatabase.rawQuery("select * from table_tomb left join table_owner " +
-                "on table_tomb.tomb_id = table_owner.owner_id ", null);
+        Cursor cursor = mDatabase.rawQuery("select * from table_tomb " +
+                "left join table_decease " +
+                "on table_tomb.tomb_owner = table_decease.decease_id " +
+                "left join table_owner " +
+                "on table_owner.owner_id = table_decease.decease_owner " +
+                "where table_tomb.tomb_stat = 'occupied'", null);
+
         while (cursor.moveToNext()) {
             DataItems items = new DataItems();
 
@@ -199,10 +280,15 @@ public class DataSource {
             items.setOwner_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_FNAME)));
             items.setOwner_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_MNAME)));
             items.setOwner_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_LNAME)));
-            items.setOwner_bdate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_BDATE)));
-            items.setOwner_ddate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_DDATE)));
+            items.setOwner_address(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_ADDRESS)));
             items.setOwner_con_per(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_CON_PER)));
-            items.setOwner_status(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_STATUS)));
+            items.setDecease_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_DECEASE_ID)));
+            items.setDecease_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_FNAME)));
+            items.setDecease_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_MNAME)));
+            items.setDecease_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_LNAME)));
+            items.setDecease_ddate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_DDATE)));
+            items.setDecease_bdate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_DDATE)));
+            items.setDecease_owner(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_DECEASE_OWNER)));
             dataItems.add(items);
         }
         cursor.close();
@@ -210,8 +296,43 @@ public class DataSource {
     }
 
 
+    public List<DataItems> searchListDeceased(CharSequence search) {
+        List<DataItems> dataItems = new ArrayList<>();
+        Cursor cursor = mDatabase.rawQuery("select * from table_tomb " +
+                "left join table_decease " +
+                "on table_tomb.tomb_owner = table_decease.decease_id " +
+                "left join table_owner " +
+                "on table_owner.owner_id = table_decease.decease_owner " +
+                "where table_tomb.tomb_stat = 'occupied' and table_decease.decease_fname like ? ", new String[]{search.toString()});
 
+        while (cursor.moveToNext()) {
+            DataItems items = new DataItems();
 
+            items.setTomb_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_ID)));
+            items.setTomb_block(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_BLOCK)));
+            items.setTomb_lot_no(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_LOT_NO)));
+            items.setTomb_lat(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LAT)));
+            items.setTomb_long(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LONG)));
+            items.setTomb_stat(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_STAT)));
+            items.setTomb_owner(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_OWNER)));
+            items.setOwner_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_OWNER_ID)));
+            items.setOwner_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_FNAME)));
+            items.setOwner_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_MNAME)));
+            items.setOwner_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_LNAME)));
+            items.setOwner_address(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_ADDRESS)));
+            items.setOwner_con_per(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_OWNER_CON_PER)));
+            items.setDecease_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_DECEASE_ID)));
+            items.setDecease_fname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_FNAME)));
+            items.setDecease_mname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_MNAME)));
+            items.setDecease_lname(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_LNAME)));
+            items.setDecease_ddate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_DDATE)));
+            items.setDecease_bdate(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_DECEASE_DDATE)));
+            items.setDecease_owner(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_DECEASE_OWNER)));
+            dataItems.add(items);
+        }
+        cursor.close();
+        return dataItems;
+    }
 //    public List<TombItems> getItems() {
 //        List<TombItems> dataItems = new ArrayList<>();
 //        String selling = "SELECT * FROM " + ItemsTable.TABLE_LOCATION;

@@ -12,10 +12,16 @@ public class OwnerItems implements Parcelable {
     private String owner_fname;
     private String owner_mname;
     private String owner_lname;
-    private String owner_bdate;
-    private String owner_ddate;
+    private String owner_address;
     private String owner_con_per;
-    private String owner_status;
+
+    public OwnerItems(String owner_fname, String owner_mname, String owner_lname, String owner_address, String owner_con_per) {
+        this.owner_fname = owner_fname;
+        this.owner_mname = owner_mname;
+        this.owner_lname = owner_lname;
+        this.owner_address = owner_address;
+        this.owner_con_per = owner_con_per;
+    }
 
     public OwnerItems(){}
 
@@ -23,36 +29,23 @@ public class OwnerItems implements Parcelable {
 
     public ContentValues ownerValues()
     {
-        ContentValues values = new ContentValues(7);
+        ContentValues values = new ContentValues(5);
         values.put(ItemsTable.COL_OWNER_FNAME,owner_fname);
         values.put(ItemsTable.COL_OWNER_MNAME,owner_mname);
         values.put(ItemsTable.COL_OWNER_LNAME,owner_lname);
-        values.put(ItemsTable.COL_OWNER_BDATE,owner_bdate);
-        values.put(ItemsTable.COL_OWNER_DDATE,owner_ddate);
+        values.put(ItemsTable.COL_OWNER_ADDRESS,owner_address);
         values.put(ItemsTable.COL_OWNER_CON_PER,owner_con_per);
-        values.put(ItemsTable.COL_OWNER_STATUS,owner_status);
         return values;
     }
 
-    public OwnerItems(int owner_id, String owner_fname, String owner_mname, String owner_lname, String owner_bdate, String owner_ddate, String owner_con_per, String owner_status) {
+
+    public OwnerItems(int owner_id, String owner_fname, String owner_mname, String owner_lname, String owner_address, String owner_con_per) {
         this.owner_id = owner_id;
         this.owner_fname = owner_fname;
         this.owner_mname = owner_mname;
         this.owner_lname = owner_lname;
-        this.owner_bdate = owner_bdate;
-        this.owner_ddate = owner_ddate;
+        this.owner_address = owner_address;
         this.owner_con_per = owner_con_per;
-        this.owner_status = owner_status;
-    }
-
-    public OwnerItems(String owner_fname, String owner_mname, String owner_lname, String owner_bdate, String owner_ddate, String owner_con_per, String owner_status) {
-        this.owner_fname = owner_fname;
-        this.owner_mname = owner_mname;
-        this.owner_lname = owner_lname;
-        this.owner_bdate = owner_bdate;
-        this.owner_ddate = owner_ddate;
-        this.owner_con_per = owner_con_per;
-        this.owner_status = owner_status;
     }
 
     public int getOwner_id() {
@@ -87,20 +80,12 @@ public class OwnerItems implements Parcelable {
         this.owner_lname = owner_lname;
     }
 
-    public String getOwner_bdate() {
-        return owner_bdate;
+    public String getOwner_address() {
+        return owner_address;
     }
 
-    public void setOwner_bdate(String owner_bdate) {
-        this.owner_bdate = owner_bdate;
-    }
-
-    public String getOwner_ddate() {
-        return owner_ddate;
-    }
-
-    public void setOwner_ddate(String owner_ddate) {
-        this.owner_ddate = owner_ddate;
+    public void setOwner_address(String owner_address) {
+        this.owner_address = owner_address;
     }
 
     public String getOwner_con_per() {
@@ -111,23 +96,13 @@ public class OwnerItems implements Parcelable {
         this.owner_con_per = owner_con_per;
     }
 
-    public String getOwner_status() {
-        return owner_status;
-    }
-
-    public void setOwner_status(String owner_status) {
-        this.owner_status = owner_status;
-    }
-
     protected OwnerItems(Parcel in) {
         owner_id = in.readInt();
         owner_fname = in.readString();
         owner_mname = in.readString();
         owner_lname = in.readString();
-        owner_bdate = in.readString();
-        owner_ddate = in.readString();
+        owner_address = in.readString();
         owner_con_per = in.readString();
-        owner_status = in.readString();
     }
 
     @Override
@@ -136,10 +111,8 @@ public class OwnerItems implements Parcelable {
         dest.writeString(owner_fname);
         dest.writeString(owner_mname);
         dest.writeString(owner_lname);
-        dest.writeString(owner_bdate);
-        dest.writeString(owner_ddate);
+        dest.writeString(owner_address);
         dest.writeString(owner_con_per);
-        dest.writeString(owner_status);
     }
 
     @Override

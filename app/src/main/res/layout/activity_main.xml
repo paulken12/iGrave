@@ -22,6 +22,59 @@
             android:layout_height="wrap_content"
             app:tabMode="fixed"
             app:tabGravity="fill"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#4285F4"
+            android:padding="10dp">
+
+            <View
+                android:id="@+id/anchor"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_centerInParent="true" />
+
+            <TextView
+                android:id="@+id/total_count"
+                android:layout_toEndOf="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toStartOf="@+id/anchor"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:text="Total no. of lots : 100"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#4285F4"
+                android:layout_toEndOf="@+id/total_count"
+                android:padding="10dp">
+
+
+                <TextView
+                    android:id="@+id/occupied_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total no. of available lots : 100"
+                    android:layout_marginEnd="10dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/empty_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total no. of occupied lots : 100"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.view.ViewPager

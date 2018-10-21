@@ -5,6 +5,7 @@ public class ItemsTable {
 
     public static final String TABLE_TOMB="table_tomb";
     public static final String TABLE_OWNER="table_owner";
+    public static final String TABLE_DECEASE="table_decease";
 
 
     public static final String COL_TOMB_ID ="tomb_id";
@@ -15,14 +16,20 @@ public class ItemsTable {
     public static final String COL_TOMB_STAT ="tomb_stat";
     public static final String COL_TOMB_OWNER ="tomb_owner";
 
+    public static final String COL_DECEASE_ID ="decease_id";
+    public static final String COL_DECEASE_FNAME ="decease_fname";
+    public static final String COL_DECEASE_MNAME ="decease_mname";
+    public static final String COL_DECEASE_LNAME ="decease_lname";
+    public static final String COL_DECEASE_BDATE ="decease_bdate";
+    public static final String COL_DECEASE_DDATE ="decease_ddate";
+    public static final String COL_DECEASE_OWNER ="decease_owner";
+
     public static final String COL_OWNER_ID ="owner_id";
     public static final String COL_OWNER_FNAME ="owner_fname";
     public static final String COL_OWNER_MNAME ="owner_mname";
     public static final String COL_OWNER_LNAME ="owner_lname";
-    public static final String COL_OWNER_BDATE ="owner_bdate";
-    public static final String COL_OWNER_DDATE ="owner_ddate";
+    public static final String COL_OWNER_ADDRESS ="owner_address";
     public static final String COL_OWNER_CON_PER ="owner_con_per";
-    public static final String COL_OWNER_STATUS ="owner_status";
     
     public static final String[] ALL_COLUMNS = {COL_TOMB_BLOCK,COL_TOMB_LOT_NO,COL_TOMB_LAT,COL_TOMB_LONG,COL_TOMB_STAT,COL_TOMB_OWNER};
 
@@ -54,11 +61,20 @@ public class ItemsTable {
             COL_OWNER_FNAME+" TEXT," +
             COL_OWNER_MNAME+" TEXT," +
             COL_OWNER_LNAME+" TEXT," +
-            COL_OWNER_BDATE+" TEXT," +
-            COL_OWNER_DDATE+" TEXT," +
+            COL_OWNER_ADDRESS+" TEXT," +
             COL_OWNER_CON_PER+" TEXT," +
-            COL_OWNER_STATUS+" TEXT," +
             " FOREIGN KEY("+ COL_OWNER_ID +") REFERENCES "+TABLE_OWNER+"("+ COL_OWNER_ID +"))";
+
+    public static final String CREATE_DECEASE ="CREATE TABLE "+TABLE_DECEASE+ "("+
+            COL_DECEASE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            COL_DECEASE_FNAME+" TEXT," +
+            COL_DECEASE_MNAME+" TEXT," +
+            COL_DECEASE_LNAME+" TEXT," +
+            COL_DECEASE_BDATE+" TEXT," +
+            COL_DECEASE_DDATE+" TEXT," +
+            COL_DECEASE_OWNER+" INTEGER," +
+            " FOREIGN KEY("+ COL_DECEASE_ID +") REFERENCES "+TABLE_DECEASE+"("+ COL_DECEASE_ID +"))";
+
 
 
     public static final String  DROP_TOMB = "DROP TABLE "+TABLE_TOMB;

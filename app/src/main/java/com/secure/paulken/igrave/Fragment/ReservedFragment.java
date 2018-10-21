@@ -49,7 +49,7 @@ public class ReservedFragment extends Fragment {
 
         listView = mView.findViewById(R.id.tomb_list);
 
-        display();
+//        display();
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -89,20 +89,20 @@ public class ReservedFragment extends Fragment {
         return mView;
     }
 
-    public void display()
-    {
-        dataSource.open();
-        dataItems = dataSource.getReserved();
-        ListAdapter listAdapter = new ListAdapter(getContext(), dataItems);
-        listView.setAdapter(listAdapter);
-    }
+//    public void display()
+//    {
+//        dataSource.open();
+//        dataItems = dataSource.getReserved();
+//        ListAdapter listAdapter = new ListAdapter(getContext(), dataItems);
+//        listView.setAdapter(listAdapter);
+//    }
 
 
     @Override
     public void onResume() {
         super.onResume();
         dataSource.open();
-        display();
+//        display();
     }
 
     @Override

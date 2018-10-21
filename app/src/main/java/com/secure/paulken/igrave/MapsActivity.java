@@ -37,14 +37,17 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.secure.paulken.igrave.DBHelper.DeceaseProvider;
 import com.secure.paulken.igrave.DBHelper.OwnerProvider;
 import com.secure.paulken.igrave.DBHelper.TombProvider;
 import com.secure.paulken.igrave.DBHelper.DataSource;
 import com.secure.paulken.igrave.Model.DataItems;
+import com.secure.paulken.igrave.Model.DeceaseItems;
 import com.secure.paulken.igrave.Model.OwnerItems;
 import com.secure.paulken.igrave.Model.TombItems;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -65,7 +68,8 @@ public class MapsActivity extends FragmentActivity implements
     Marker markers;
 
     List<TombItems> tombItems = TombProvider.getData();
-    List<OwnerItems> deceaseItems = OwnerProvider.getData();
+    List<OwnerItems> ownerItems = OwnerProvider.getData();
+    List<DeceaseItems> deceaseItems = DeceaseProvider.getData();
     List<DataItems> dataItems;
 
     private long thisTime = 0;
@@ -84,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements
     EditText search;
     TextView distance;
     Button searchMe;
-    EditText name;
+    EditText fname,mname,lname;
     Polygon block_6, block_7, block_3, block_4, block_9;
 
     private static final int POLYLINE_STROKE_WIDTH_PX = 12;
@@ -128,9 +132,16 @@ public class MapsActivity extends FragmentActivity implements
                     e.printStackTrace();
                 }
             }
-            for (OwnerItems decease : deceaseItems) {
+            for (OwnerItems decease : ownerItems) {
                 try {
                     mDataSource.insertOwner(decease);
+                } catch (SQLiteException e) {
+                    e.printStackTrace();
+                }
+            }
+            for (DeceaseItems decease : deceaseItems) {
+                try {
+                    mDataSource.insertDecease(decease);
                 } catch (SQLiteException e) {
                     e.printStackTrace();
                 }
@@ -140,7 +151,9 @@ public class MapsActivity extends FragmentActivity implements
 
 
         search = findViewById(R.id.search);
-        name = findViewById(R.id.name);
+        fname = findViewById(R.id.first_name);
+        mname = findViewById(R.id.middle_name);
+        lname = findViewById(R.id.last_name);
         searchMe = findViewById(R.id.button1);
         distance = findViewById(R.id.distance);
     }
@@ -311,7 +324,6 @@ public class MapsActivity extends FragmentActivity implements
 //
         List<DataItems> items = mDataSource.getAll();
 
-
         for(DataItems dataItems: items){
             markers = mMap.addMarker(marker(String.valueOf(dataItems.getTomb_lot_no()), dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
         }
@@ -330,11 +342,13 @@ public class MapsActivity extends FragmentActivity implements
         googleMap.getUiSettings().setCompassEnabled(false);
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
 
+
+
         searchMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                String nam = name.getText().toString();
+                String nam = fname.getText().toString();
                 List<DataItems> list = mDataSource.getAll();
 
 //                removeFill();
@@ -390,7 +404,7 @@ public class MapsActivity extends FragmentActivity implements
 //                                        .width(4)
 //                                        .color(Color.RED));
 
-                            distance.setText(CalculationByDistance(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()), new LatLng(ur_lat, ur_lon)));
+                            distance.setText(CalculationByDistance(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()), new LatLng(16.376665, 120.608495)));
 
                         }
                         else{
@@ -444,7 +458,7 @@ public class MapsActivity extends FragmentActivity implements
                     {
                         int lot_number = Integer.parseInt(search.getText().toString());
 
-                        if (lot_number >= 32 & lot_number <= 71 ) {
+                        if (lot_number >= 1 & lot_number <= 32 ) {
 //                            removeLine();
                             block(block_9);
                             CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -483,13 +497,13 @@ public class MapsActivity extends FragmentActivity implements
                                     .add(one,two,three,four,new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()))
                                     .width(4)
                                     .pattern(PATTERN_POLYLINE_DOTTED)
-                                    .color(Color.RED));
+                                    .color(Color.YELLOW));
 //                                line = mMap.addPolyline(new PolylineOptions()
 //                                        .add(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()),two,new LatLng(16.376665, 120.608495),new LatLng(16.376568, 120.608833), new LatLng(ur_lat, ur_lon))
 //                                        .width(4)
 //                                        .color(Color.RED));
 
-                                distance.setText(CalculationByDistance(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()),new LatLng(ur_lat, ur_lon)));
+                                distance.setText(CalculationByDistance(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()), new LatLng(16.376665, 120.608495)));
 
 
                             }
@@ -777,16 +791,20 @@ public class MapsActivity extends FragmentActivity implements
         DecimalFormat newFormat = new DecimalFormat("####");
         int kmInDec = Integer.valueOf(newFormat.format(km));
 
+        int m = 1000;
 
+        double meters = km*m;
         double meter = valueResult % 1000;
         int meterInDec = Integer.valueOf(newFormat.format(meter));
 
-        DecimalFormat format = new DecimalFormat("#.#####");
-        String formatted = format.format(valueResult);
+        DecimalFormat form = new DecimalFormat("####");
+        int test = Integer.valueOf(form.format(meters));
 
-        Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
-                + " Meter   " + meterInDec);
 
-        return formatted + "km";
+
+        Log.i("Radius Value", "" + valueResult + "   KM  " + meter
+                + " Meter   " );
+
+        return test + " m";
     }
 }

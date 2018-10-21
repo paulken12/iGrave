@@ -34,7 +34,7 @@ public class ListActivity extends AppCompatActivity {
         mDataSource = new DataSource(this);
         mDataSource.open();
 
-        display();
+//        display();
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -110,12 +110,12 @@ e
 
     }
 
-    public void display()
-    {
-        dataItems = mDataSource.getAllItems();
-        ListAdapter listAdapter = new ListAdapter(this, dataItems);
-        listView.setAdapter(listAdapter);
-    }
+//    public void display()
+//    {
+//        dataItems = mDataSource.getAllItems();
+//        ListAdapter listAdapter = new ListAdapter(this, dataItems);
+//        listView.setAdapter(listAdapter);
+//    }
 
 
     @Override

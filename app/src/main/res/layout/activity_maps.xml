@@ -37,10 +37,24 @@
         android:onClick="TapEvent" />
 
         <EditText
-        android:id="@+id/name"
+        android:id="@+id/first_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search Name"
+        android:hint="First name"
+        android:inputType="text" />
+
+        <EditText
+        android:id="@+id/middle_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Middle Name"
+        android:inputType="text" />
+
+        <EditText
+        android:id="@+id/last_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Last name"
         android:inputType="text" />
 
 
@@ -76,30 +90,11 @@
                     android:text="Occupied Lot" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/r"
-                android:padding="10dp"
-                android:layout_below="@+id/o"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/m2" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="Reserved Lot"/>
-            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/e"
                 android:padding="10dp"
-                android:layout_below="@+id/r"
+                android:layout_below="@+id/o"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
