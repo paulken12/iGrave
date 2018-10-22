@@ -462,6 +462,7 @@ public class MapsActivity extends FragmentActivity implements
                                     .build();
                             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
+
                             markers = mMap.addMarker(marker(String.valueOf(dataItems.getDecease_fname())+" "+String.valueOf(dataItems.getDecease_lname())
                                     ,dataItems.getDecease_bdate()+" to "+dataItems.getDecease_ddate()
                                     , dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
@@ -473,7 +474,8 @@ public class MapsActivity extends FragmentActivity implements
 
                             if (lot_number == lot_num) {
 
-
+                                removeMarker();
+                                removeLine();
                                 MarkerOptions mark = new MarkerOptions()
                                         .title(dataItems.getOwner_fname()+","+dataItems.getOwner_fname())
                                         .position(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()))
@@ -649,8 +651,6 @@ public class MapsActivity extends FragmentActivity implements
             polyline.setPattern(null);
         }
 
-        Toast.makeText(this, "Route type " + polyline.getTag().toString(),
-                Toast.LENGTH_SHORT).show();
     }
 
 
@@ -661,8 +661,6 @@ public class MapsActivity extends FragmentActivity implements
         polygon.setStrokeColor(color);
         color = polygon.getFillColor() ^ 0x00ffffff;
         polygon.setFillColor(color);
-
-        Toast.makeText(this, "Area type " + polygon.getTag().toString(), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -672,9 +670,6 @@ public class MapsActivity extends FragmentActivity implements
         polygon.setStrokeColor(color);
         color = polygon.getFillColor() ^ 0x00ffffff;
         polygon.setFillColor(color);
-
-        Toast.makeText(this, "Area type " + polygon.getTag().toString(), Toast.LENGTH_SHORT).show();
-
     }
 
     @Override
