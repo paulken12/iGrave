@@ -790,6 +790,8 @@ public class MapsActivity extends FragmentActivity implements
 
     public void clear_all(View view) {
 
+        distance.setText("0 m");
+
         for (Marker marker : markerArrayList) {
             marker.remove();
         }
