@@ -339,7 +339,7 @@ public class DataSource {
     public List<DataItems> searchDeceasedInLot(String search) {
         List<DataItems> dataItems = new ArrayList<>();
         String fSearch = "%"+search+"%";
-        Cursor cursor = mDatabase.rawQuery("select * from table_tomb " +
+        Cursor cursor = mDatabase.rawQuery("select * ,table_decease.decease_fname || ' ' || table_decease.decease_lname as fullname from table_tomb " +
                 "left join table_decease " +
                 "on table_tomb.tomb_owner = table_decease.decease_id " +
                 "left join table_owner " +
@@ -348,7 +348,7 @@ public class DataSource {
                 "and table_decease.decease_fname  like ? " +
                 "or table_decease.decease_mname like ? " +
                 "or table_decease.decease_lname like ? " +
-                "or table_decease.decease_fname || ' ' || table_decease.decease_lname like ?", new String[]{fSearch, fSearch, fSearch, fSearch});
+                "or fullname like ?", new String[]{fSearch, fSearch, fSearch, fSearch});
 
         while (cursor.moveToNext()) {
             DataItems items = new DataItems();
