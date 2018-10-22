@@ -6,8 +6,11 @@ import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.SystemClock;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -65,13 +68,16 @@ public class MapsActivity extends FragmentActivity implements
 
     int mark;
 
+    ArrayList<Marker> markerArrayList = new ArrayList<>();
+    ArrayList<Polyline> polylineArrayList = new ArrayList<>();
+
     Polyline line;
     Marker markers;
 
     List<TombItems> tombItems = TombProvider.getData();
     List<OwnerItems> ownerItems = OwnerProvider.getData();
     List<DeceaseItems> deceaseItems = DeceaseProvider.getData();
-    List<DataItems> dataItems;
+    List<DataItems> dataItems,deads;
 
     private long thisTime = 0;
     private long prevTime = 0;
@@ -154,11 +160,59 @@ public class MapsActivity extends FragmentActivity implements
 
 
         search = findViewById(R.id.search);
-        fname = findViewById(R.id.first_name);
-        mname = findViewById(R.id.middle_name);
-        lname = findViewById(R.id.last_name);
+        fname = findViewById(R.id.full_name);
         searchMe = findViewById(R.id.button1);
         distance = findViewById(R.id.distance);
+
+        fname.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() == 0)
+                {
+                    search.setEnabled(true);
+                    search.setHint("Search Lot");
+                }
+                else {
+                    search.setEnabled(false);
+                    search.setHint("Disabled");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() == 0)
+                {
+                    fname.setEnabled(true);
+                    fname.setHint("Search Name");
+                }
+                else {
+                    fname.setEnabled(false);
+                    fname.setHint("Disabled");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
 
@@ -314,19 +368,7 @@ public class MapsActivity extends FragmentActivity implements
         // Style the polygon.
         stylePolygon(block_9);
 
-
-
-//        line = mMap.addPolyline(new PolylineOptions()
-//                                    .add(one,two,three,four)
-//                                    .width(4)
-//                                    .pattern(PATTERN_POLYLINE_DOTTED)
-//                                    .color(Color.RED));
-
-//        TextView dist = findViewById(R.id.distance);
-//
-//        dist.setText(CalculationByDistance(one,two));
-//
-        List<DataItems> items = mDataSource.getAll();
+        List<DataItems> items = mDataSource.getAllItems();
 
         for(DataItems dataItems: items){
             markers = mMap.addMarker(marker(String.valueOf(dataItems.getDecease_fname())+" "+String.valueOf(dataItems.getDecease_lname())
@@ -340,11 +382,10 @@ public class MapsActivity extends FragmentActivity implements
                 .bearing(250)
                 .tilt(0)
                 .build();
-//
+
         yourHere = new LatLng(ur_lat, ur_lon);
         googleMap.addMarker(new MarkerOptions().position(yourHere).title("Your Here"));
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-////        googleMap.getUiSettings().setScrollGesturesEnabled(false);
         googleMap.getUiSettings().setCompassEnabled(false);
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
 
@@ -357,20 +398,15 @@ public class MapsActivity extends FragmentActivity implements
                 String nam = fname.getText().toString();
                 List<DataItems> list = mDataSource.getAll();
 
-//                removeFill();
-//                removeLine();
-//                removeMarker();
-//
-
-
                 for (DataItems dataItems : list) {
 
                     int lot_num = dataItems.getTomb_lot_no();
 
                     if(!nam.equals(""))
                     {
-                        if(nam.equalsIgnoreCase("elena"))
-                        {
+                        List<DataItems> deceased  = mDataSource.searchDeceasedInLot(nam);
+
+                        for(DataItems decease : deceased){
                             block(block_9);
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(new LatLng(16.376621, 120.608347))
@@ -380,93 +416,43 @@ public class MapsActivity extends FragmentActivity implements
                                     .build();
                             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                            markers = mMap.addMarker(marker(String.valueOf(dataItems.getDecease_fname())+" "+String.valueOf(dataItems.getDecease_lname())
-                                    ,dataItems.getDecease_bdate()+" to "+dataItems.getDecease_ddate()
-                                    , dataItems.getTomb_lat(), dataItems.getTomb_long(),dataItems.getTomb_stat()));
+                            markers = mMap.addMarker(marker(String.valueOf(decease.getDecease_fname())+" "+String.valueOf(decease.getDecease_lname())
+                                    ,decease.getDecease_bdate()+" to "+decease.getDecease_ddate()
+                                    , decease.getTomb_lat(), decease.getTomb_long(),decease.getTomb_stat()));
+                            markerArrayList.add(markers);
+
                             MarkerOptions a = new MarkerOptions()
                                     .title("Pathway")
                                     .position(new LatLng(16.376665, 120.608495))
                                     .icon(BitmapDescriptorFactory.defaultMarker());
                             markers = mMap.addMarker(a);
+                            markerArrayList.add(markers);
+
                             MarkerOptions mark = new MarkerOptions()
-//                                    .title(n.getFirst_name()+" "+n.getLast_name()+" Birthday:" + n.getBirth_date())
-                                    .title(dataItems.getOwner_fname() + "," + dataItems.getOwner_fname())
-                                    .position(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()))
+                                    .title(decease.getOwner_fname() + "," + decease.getOwner_fname())
+                                    .position(new LatLng(decease.getTomb_lat(), decease.getTomb_long()))
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-//
+
                             markers = mMap.addMarker(mark);
-                            //line = mMap.addPolyline(drawLine(marker("",dataItems.getLatitude(),dataItems.getLongitude()),marker("",ur_lat,ur_lon)));
-
-                            removeLine();
-                            removeMarker();
-
+                            markerArrayList.add(markers);
 
                             line = mMap.addPolyline(new PolylineOptions()
-                                    .add(one, two, three, four, new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()))
+                                    .add(one, two, three, four, new LatLng(decease.getTomb_lat(), decease.getTomb_long()))
                                     .width(4)
                                     .pattern(PATTERN_POLYLINE_DOTTED)
                                     .color(Color.RED));
-//                                line = mMap.addPolyline(new PolylineOptions()
-//                                        .add(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()),two,new LatLng(16.376665, 120.608495),new LatLng(16.376568, 120.608833), new LatLng(ur_lat, ur_lon))
-//                                        .width(4)
-//                                        .color(Color.RED));
 
-                            distance.setText(CalculationByDistance(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()), new LatLng(16.376665, 120.608495)));
+                            polylineArrayList.add(line);
+
+                            distance.setText(CalculationByDistance(new LatLng(decease.getTomb_lat(), decease.getTomb_long()), new LatLng(16.376665, 120.608495)));
 
                         }
-                        else{
-                            Toast.makeText(MapsActivity.this,"Sorry we can't find your request",Toast.LENGTH_LONG).show();
-                        }
-
-//                        for(DataItems n: list)
-//                        {
-////                            removeLine();
-//                            block(block_9);
-//                            CameraPosition cameraPosition = new CameraPosition.Builder()
-//                                    .target(new LatLng(16.376621, 120.608347))
-//                                    .zoom(20)
-//                                    .bearing(250)
-//                                    .tilt(0)
-//                                    .build();
-//                            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//
-//                            markers = mMap.addMarker(marker(String.valueOf(n.getTomb_lot_no()), n.getTomb_lat(), n.getTomb_long(),n.getTomb_stat()));
-//
-//                            MarkerOptions a = new MarkerOptions()
-//                                    .title("Pathway")
-//                                    .position(new LatLng(16.376665, 120.608495))
-//                                    .icon(BitmapDescriptorFactory.defaultMarker());
-//                            markers = mMap.addMarker(a);
-//
-//
-////                            ======================== INSERT NAMES HERE   ======================================
-//                            MarkerOptions mark = new MarkerOptions()
-////                                    .title(n.getFirst_name()+" "+n.getLast_name()+" Birthday:" + n.getBirth_date())
-//                                    .title(n.getOwner_fname()+","+n.getOwner_fname())
-//                                    .position(new LatLng(n.getTomb_lat(), n.getTomb_long()))
-//                                    .icon(BitmapDescriptorFactory.defaultMarker());
-////                            =======================================================================================
-//                            markers = mMap.addMarker(mark);
-//                            //line = mMap.addPolyline(drawLine(marker("",dataItems.getLatitude(),dataItems.getLongitude()),marker("",ur_lat,ur_lon)));
-//
-////                            removeLine();
-//                            line = mMap.addPolyline(new PolylineOptions()
-//                                    .add(one,two,three,four, new LatLng(ur_lat, ur_lon))
-//                                    .width(4)
-//                                    .color(Color.RED));
-//
-//                            distance.setText(CalculationByDistance(new LatLng(n.getTomb_lat(), n.getTomb_long()),new LatLng(ur_lat, ur_lon)));
-//
-//
-//                        }
-
                     }
                     else
                     {
                         int lot_number = Integer.parseInt(search.getText().toString());
 
                         if (lot_number >= 1 & lot_number <= 32 ) {
-//                            removeLine();
                             block(block_9);
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(new LatLng(16.376621, 120.608347))
@@ -492,33 +478,19 @@ public class MapsActivity extends FragmentActivity implements
                                         .title(dataItems.getOwner_fname()+","+dataItems.getOwner_fname())
                                         .position(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()))
                                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-//
                                 markers = mMap.addMarker(mark);
-                                //line = mMap.addPolyline(drawLine(marker("",dataItems.getLatitude(),dataItems.getLongitude()),marker("",ur_lat,ur_lon)));
-
-                                removeLine();
-                                removeMarker();
-
 
                                 line = mMap.addPolyline(new PolylineOptions()
                                     .add(one,two,three,four,new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()))
                                     .width(4)
                                     .pattern(PATTERN_POLYLINE_DOTTED)
                                     .color(Color.YELLOW));
-//                                line = mMap.addPolyline(new PolylineOptions()
-//                                        .add(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()),two,new LatLng(16.376665, 120.608495),new LatLng(16.376568, 120.608833), new LatLng(ur_lat, ur_lon))
-//                                        .width(4)
-//                                        .color(Color.RED));
+                                polylineArrayList.add(line);
 
                                 distance.setText(CalculationByDistance(new LatLng(dataItems.getTomb_lat(), dataItems.getTomb_long()), new LatLng(16.376665, 120.608495)));
-
-
                             }
-
-
                         } else {
-//                            removeLine();
-                            removeFill();
+
                             Toast.makeText(MapsActivity.this, "You enter invalid information", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -531,11 +503,6 @@ public class MapsActivity extends FragmentActivity implements
 
             }
         });
-
-
-        // Set listeners for click events.
-//        googleMap.setOnPolylineClickListener(this);
-//        googleMap.setOnPolygonClickListener(this);
 
     }
 
@@ -565,6 +532,11 @@ public class MapsActivity extends FragmentActivity implements
         stylePolygon(block_9);
     }
 
+    public String ifNull(String items) {
+
+        return items != null ? items : "-";
+    }
+
     public MarkerOptions marker(String title,String snippet, double lat, double lon, String stat) {
 
         if(stat.equalsIgnoreCase("occupied")){
@@ -577,8 +549,8 @@ public class MapsActivity extends FragmentActivity implements
             mark = R.drawable.m3;
         }
         MarkerOptions a = new MarkerOptions()
-                .title(title)
-                .snippet(snippet)
+                .title(ifNull(title))
+                .snippet(ifNull(snippet))
                 .position(new LatLng(lat, lon))
                 .icon(BitmapDescriptorFactory.fromResource(mark));
 
@@ -814,5 +786,18 @@ public class MapsActivity extends FragmentActivity implements
                 + " Meter   " );
 
         return test + " m";
+    }
+
+    public void clear_all(View view) {
+
+        for (Marker marker : markerArrayList) {
+            marker.remove();
+        }
+        markerArrayList.clear();
+
+        for (Polyline polyline : polylineArrayList) {
+            polyline.remove();
+        }
+        polylineArrayList.clear();
     }
 }

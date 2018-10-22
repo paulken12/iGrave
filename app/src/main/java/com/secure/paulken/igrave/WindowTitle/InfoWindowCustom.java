@@ -27,8 +27,8 @@ public class InfoWindowCustom implements GoogleMap.InfoWindowAdapter {
 
         TextView title = v.findViewById(R.id.info_name);
         TextView bdate =  v.findViewById(R.id.info_birth_date);
-        title.setText(marker.getTitle());
-        bdate.setText(marker.getSnippet());
+        title.setText(ifNull(marker.getTitle()));
+        bdate.setText(ifNull(marker.getSnippet()));
         return v;
     }
 
@@ -40,5 +40,10 @@ public class InfoWindowCustom implements GoogleMap.InfoWindowAdapter {
             marker.showInfoWindow();
         }
         return null;
+    }
+
+    public String ifNull(String items) {
+
+        return items != null ? items : "-";
     }
 }

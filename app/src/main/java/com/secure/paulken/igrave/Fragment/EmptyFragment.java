@@ -72,9 +72,10 @@ public class EmptyFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Intent intent = new Intent(getActivity(),SettingActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_NO_HISTORY);
                         intent.putExtra(ADD_KEY ,items);
                         startActivity(intent);
+                        getActivity().finish();
                     }
                 })
                         .setNegativeButton("Cancel ", new DialogInterface.OnClickListener() {

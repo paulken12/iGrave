@@ -38,6 +38,7 @@ public class SettingActivity extends AppCompatActivity {
     String block_spin;
     Spinner block_spinner;
     TextView tv_block_num,tv_lot_num;
+    Intent intent;
 
 
     Button submit;
@@ -90,8 +91,9 @@ public class SettingActivity extends AppCompatActivity {
 //        block_spinner.setAdapter(adapter);
 
 
+        intent = getIntent();
 
-        dataItems = Objects.requireNonNull(getIntent().getExtras()).getParcelable(AllFragment.UPDATE_KEY);
+        dataItems = Objects.requireNonNull(intent.getExtras()).getParcelable(AllFragment.UPDATE_KEY);
         if (dataItems != null) {
 
             dec_first.setText(dataItems.getDecease_fname());
@@ -150,9 +152,13 @@ public class SettingActivity extends AppCompatActivity {
 
         if(dataItems != null){
             update();
+            intent.removeExtra(AllFragment.UPDATE_KEY);
+            clearIntent();
         }
         else {
             add();
+            intent.removeExtra(EmptyFragment.ADD_KEY);
+            clearIntent();
         }
 
 
@@ -207,7 +213,9 @@ public class SettingActivity extends AppCompatActivity {
         {
             OwnerItems info =  new OwnerItems(oFirst,oMiddle,oLast,oAdd,oCon);
             mDataSource.insertOwner(info);
-            int lastOwnerId = mDataSource.lastIdOwner();
+            int lastOwnerId = mDataSource.lastIdOwner() + 1;
+
+            Log.e("ididid",""+lastOwnerId);
 
             DeceaseItems deceaseItems = new DeceaseItems(mFirst,mMiddle,mLast,mBDay,mDDay,lastOwnerId);
             mDataSource.insertDecease(deceaseItems);
@@ -303,5 +311,12 @@ public class SettingActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Toast.makeText(SettingActivity.this,"Setting Backpressed", Toast.LENGTH_LONG).show();
+    }
+
+    public  void clearIntent(){
+        intent.replaceExtras(new Bundle());
+        intent.setAction("");
+        intent.setData(null);
+        intent.setFlags(0);
     }
 }
