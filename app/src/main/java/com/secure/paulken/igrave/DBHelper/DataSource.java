@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.secure.paulken.igrave.Model.DataItems;
@@ -240,9 +241,33 @@ public class DataSource {
 //        return dataItems;
 //    }
 
-    public List<DataItems> getEmpty() {
+    public List<DataItems> getEmpty(CharSequence sequence) {
         List<DataItems> dataItems = new ArrayList<>();
-        Cursor cursor = mDatabase.rawQuery("select * from table_tomb where table_tomb.tomb_stat = 'empty'", null);
+        Cursor cursor = mDatabase.rawQuery("select * from table_tomb where table_tomb.tomb_stat = 'empty'" +
+                "and table_tomb.tomb_block = ?", new String[]{sequence.toString()});
+        while (cursor.moveToNext()) {
+            DataItems items = new DataItems();
+
+            items.setTomb_id(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_ID)));
+            items.setTomb_block(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_BLOCK)));
+            items.setTomb_lot_no(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_LOT_NO)));
+            items.setTomb_lat(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LAT)));
+            items.setTomb_long(cursor.getDouble(cursor.getColumnIndex(ItemsTable.COL_TOMB_LONG)));
+            items.setTomb_stat(cursor.getString(cursor.getColumnIndex(ItemsTable.COL_TOMB_STAT)));
+            items.setTomb_owner(cursor.getInt(cursor.getColumnIndex(ItemsTable.COL_TOMB_OWNER)));
+            dataItems.add(items);
+        }
+        cursor.close();
+        return dataItems;
+    }
+
+    public List<DataItems> getEmptyLot(String lot, String block) {
+        List<DataItems> dataItems = new ArrayList<>();
+        Cursor cursor = mDatabase.rawQuery("select * from table_tomb where table_tomb.tomb_stat = 'empty'" +
+                "and table_tomb.tomb_block = '"+block+"' " +
+                "and table_tomb.tomb_lot_no  = "+ Integer.parseInt(lot),null);
+
+        Log.e("test", ""+lot+" :"+block);
         while (cursor.moveToNext()) {
             DataItems items = new DataItems();
 
@@ -299,13 +324,18 @@ public class DataSource {
 
 
     public List<DataItems> searchListDeceased(CharSequence search) {
+        CharSequence fSearch = "%"+search+"%";
         List<DataItems> dataItems = new ArrayList<>();
-        Cursor cursor = mDatabase.rawQuery("select * from table_tomb " +
+        Cursor cursor = mDatabase.rawQuery("select * ,table_decease.decease_fname || ' ' || table_decease.decease_lname as fullname from table_tomb " +
                 "left join table_decease " +
                 "on table_tomb.tomb_owner = table_decease.decease_id " +
                 "left join table_owner " +
                 "on table_owner.owner_id = table_decease.decease_owner " +
-                "where table_tomb.tomb_stat = 'occupied' and table_decease.decease_fname like ? ", new String[]{search.toString()});
+                "where table_tomb.tomb_stat = 'occupied' " +
+                "and table_decease.decease_fname  like ? " +
+                "or table_decease.decease_mname like ? " +
+                "or table_decease.decease_lname like ? " +
+                "or fullname like ?", new String[]{fSearch.toString(), fSearch.toString(), fSearch.toString(), fSearch.toString()});
 
         while (cursor.moveToNext()) {
             DataItems items = new DataItems();
@@ -339,6 +369,7 @@ public class DataSource {
     public List<DataItems> searchDeceasedInLot(String search) {
         List<DataItems> dataItems = new ArrayList<>();
         String fSearch = "%"+search+"%";
+        String full = "%"+search;
         Cursor cursor = mDatabase.rawQuery("select * ,table_decease.decease_fname || ' ' || table_decease.decease_lname as fullname from table_tomb " +
                 "left join table_decease " +
                 "on table_tomb.tomb_owner = table_decease.decease_id " +
@@ -348,7 +379,7 @@ public class DataSource {
                 "and table_decease.decease_fname  like ? " +
                 "or table_decease.decease_mname like ? " +
                 "or table_decease.decease_lname like ? " +
-                "or fullname like ?", new String[]{fSearch, fSearch, fSearch, fSearch});
+                "or fullname like ?", new String[]{fSearch, fSearch, fSearch, full});
 
         while (cursor.moveToNext()) {
             DataItems items = new DataItems();

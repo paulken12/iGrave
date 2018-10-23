@@ -5,9 +5,32 @@
     tools:context=".Fragment.EmptyFragment">
 
     <LinearLayout
+        android:id="@+id/hanap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+
+        <Spinner
+            android:id="@+id/search_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </Spinner>
+
+        <EditText
+            android:id="@+id/search_lot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search Lot"
+            android:inputType="number"/>
+    </LinearLayout>
+
+    <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_alignParentTop="true"
+    android:layout_below="@+id/hanap"
     android:orientation="horizontal"
     android:padding="10dp">
 
@@ -24,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="80dp"
-        android:layout_marginTop="60dp" />
+        android:layout_marginTop="120dp" />
 
 
 </RelativeLayout>
